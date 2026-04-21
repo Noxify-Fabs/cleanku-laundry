@@ -19,6 +19,10 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [paymentFilter, setPaymentFilter] = useState('Semua');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebarCollapsed') === 'true';
+  });
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +34,10 @@ const AdminDashboard = () => {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [navigate]);
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+  }, [sidebarCollapsed]);
 
   const fetchData = async () => {
     try {
@@ -265,42 +273,99 @@ const AdminDashboard = () => {
       )}
 
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg fixed h-full">
-        <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold text-blue-600">CleanKu Admin</h1>
+      <div
+        className={`fixed h-full bg-white shadow-lg transition-all duration-300 ease-in-out z-40 ${
+          sidebarCollapsed ? 'w-16' : 'w-64'
+        } ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+      >
+        <div className="p-4 border-b flex items-center justify-between">
+          {!sidebarCollapsed ? (
+            <h1 className="text-xl font-bold text-blue-600">CleanKu Admin</h1>
+          ) : (
+            <span className="text-xl font-bold text-blue-600">CK</span>
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? '→' : '←'}
+          </button>
         </div>
         <nav className="p-4">
           <button
             onClick={() => setCurrentPage('dashboard')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
+            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
+              currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+            }`}
+            title={sidebarCollapsed ? 'Dashboard' : ''}
           >
-            📊 Dashboard
+            <span className="text-xl">📊</span>
+            {!sidebarCollapsed && <span>Dashboard</span>}
           </button>
           <button
             onClick={() => setCurrentPage('pesanan')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${currentPage === 'pesanan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
+            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
+              currentPage === 'pesanan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+            }`}
+            title={sidebarCollapsed ? 'Pesanan' : ''}
           >
-            📦 Pesanan {orders.length > 0 && <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{orders.length}</span>}
+            <span className="text-xl">📦</span>
+            {!sidebarCollapsed && (
+              <span className="flex-1">
+                Pesanan
+                {orders.length > 0 && <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{orders.length}</span>}
+              </span>
+            )}
+            {sidebarCollapsed && orders.length > 0 && (
+              <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{orders.length}</span>
+            )}
           </button>
           <button
             onClick={() => setCurrentPage('pengaturan')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${currentPage === 'pengaturan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
+            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
+              currentPage === 'pengaturan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+            }`}
+            title={sidebarCollapsed ? 'Pengaturan' : ''}
           >
-            ⚙️ Pengaturan
+            <span className="text-xl">⚙️</span>
+            {!sidebarCollapsed && <span>Pengaturan</span>}
           </button>
         </nav>
         <div className="absolute bottom-0 w-full p-4 border-t">
           <button
             onClick={() => { localStorage.removeItem('adminAuth'); navigate('/admin/login'); }}
-            className="w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
+            className={`w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 flex items-center gap-3`}
+            title={sidebarCollapsed ? 'Logout' : ''}
           >
-            🚪 Logout
+            <span className="text-xl">🚪</span>
+            {!sidebarCollapsed && <span>Logout</span>}
           </button>
         </div>
       </div>
 
+      {/* Mobile overlay */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile toggle button */}
+      <button
+        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
+      >
+        ☰
+      </button>
+
       {/* Main Content */}
-      <div className="ml-64 flex-1 p-8">
+      <div
+        className={`flex-1 p-8 transition-all duration-300 ease-in-out ${
+          sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
+        } ml-0`}
+      >
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">{currentPage === 'dashboard' ? 'Dashboard' : currentPage === 'pesanan' ? 'Pesanan' : 'Pengaturan'}</h2>
