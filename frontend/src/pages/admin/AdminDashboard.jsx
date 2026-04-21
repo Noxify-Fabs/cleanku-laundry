@@ -33,10 +33,13 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const [ordersRes, statsRes] = await Promise.all([
         axios.get(`${API_URL}/orders`),
         axios.get(`${API_URL}/orders/stats`)
       ]);
+      console.log('Orders response:', ordersRes.data);
+      console.log('Stats response:', statsRes.data);
       if (ordersRes.data.success) {
         setOrders(ordersRes.data.orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       }
@@ -44,7 +47,9 @@ const AdminDashboard = () => {
         setStats(statsRes.data.stats);
       }
     } catch (err) {
-      setError('Gagal mengambil data');
+      console.error('Fetch data error:', err.message);
+      console.error('API URL being used:', API_BASE_URL);
+      setError('Gagal mengambil data. Cek koneksi backend.');
     } finally {
       setIsLoading(false);
     }
