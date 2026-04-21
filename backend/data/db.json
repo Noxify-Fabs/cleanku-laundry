@@ -1,0 +1,38 @@
+{
+  "orders": [
+    {
+      "id": "CLK-20250419-0001",
+      "name": "Budi Santoso",
+      "phone": "081234567890",
+      "address": "Jl. Merdeka No. 12, Purwokerto",
+      "services": [
+        "Laundry Kiloan",
+        "Cuci + Setrika"
+      ],
+      "weight": 3,
+      "pickupDate": "2025-04-20",
+      "pickupTime": "09:00",
+      "notes": "",
+      "status": "Dicuci",
+      "createdAt": "2025-04-19T08:00:00Z"
+    },
+    {
+      "id": "CLK-20260420-1620",
+      "name": "fabs",
+      "phone": "089374666444",
+      "address": "gang sadar baturaden",
+      "services": [
+        "Laundry Kiloan",
+        "Cuci + Setrika",
+        "Laundry Sepatu"
+      ],
+      "weight": 5,
+      "pickupDate": "2026-04-20",
+      "pickupTime": "09:00",
+      "notes": "cepatt",
+      "status": "Diterima",
+      "createdAt": "2026-04-20T04:26:53.363Z"
+    }
+  ],
+  "contacts": []
+}

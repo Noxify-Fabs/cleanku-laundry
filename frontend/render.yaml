@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: cleanku-frontend
+    env: static
+    plan: free
+    buildCommand: npm install && npm run build
+    publishDir: dist
