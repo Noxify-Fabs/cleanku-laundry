@@ -84,8 +84,8 @@ app.get('/', (req, res) => {
 // Order routes
 app.post('/api/orders', upload.single('paymentProof'), createOrder);
 app.get('/api/orders', getAllOrders);
-app.get('/api/orders/:orderNumber', getOrderByNumber);
 app.get('/api/orders/stats', getOrderStats);
+app.get('/api/orders/:orderNumber', getOrderByNumber);
 app.put('/api/orders/:orderNumber', updateOrderStatus);
 app.put('/api/orders/:orderNumber/payment-status', togglePaymentStatus);
 app.delete('/api/orders/:orderNumber', deleteOrder);
