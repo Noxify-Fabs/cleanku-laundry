@@ -38,14 +38,7 @@ const CekStatus = () => {
     return colors[status] || 'bg-gray-500';
   };
 
-  const statusSteps = [
-    { label: 'Diterima', icon: '📝' },
-    { label: 'Dijemput', icon: '🚗' },
-    { label: 'Dicuci', icon: '🧺' },
-    { label: 'Disetrika', icon: '👔' },
-    { label: 'Siap Antar', icon: '📦' },
-    { label: 'Selesai', icon: '✅' },
-  ];
+  const statusSteps = ['Diterima', 'Dijemput', 'Dicuci', 'Disetrika', 'Siap Antar', 'Selesai'];
 
   return (
     <main className="pt-20 min-h-screen bg-light py-12">
@@ -131,36 +124,45 @@ const CekStatus = () => {
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-6 text-center text-dark">Progress Order</h3>
               <div className="relative">
-                {/* Progress Line */}
-                <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 rounded"></div>
-                <div 
-                  className="absolute top-5 left-0 h-1 bg-gradient-to-r from-primary to-secondary rounded transition-all duration-500"
-                  style={{ width: `${(getStatusProgress(statusResult.status) / 6) * 100}%` }}
-                ></div>
+                {/* Progress Lines */}
+                <div className="absolute top-5 left-0 right-0 h-1 flex">
+                  {statusSteps.map((_, index) => {
+                    if (index === statusSteps.length - 1) return null;
+                    const currentIndex = statusSteps.indexOf(statusResult.status);
+                    const isLineFilled = index < currentIndex;
+                    return (
+                      <div
+                        key={index}
+                        className={`flex-1 h-1 ${isLineFilled ? 'bg-blue-500' : 'bg-gray-300'}`}
+                      />
+                    );
+                  })}
+                </div>
 
                 {/* Steps */}
                 <div className="relative flex justify-between">
                   {statusSteps.map((step, index) => {
-                    const stepNumber = index + 1;
-                    const isCompleted = stepNumber <= getStatusProgress(statusResult.status);
-                    const isCurrent = stepNumber === getStatusProgress(statusResult.status);
+                    const currentIndex = statusSteps.indexOf(statusResult.status);
+                    const isCompleted = index < currentIndex;
+                    const isCurrent = index === currentIndex;
+                    const isPending = index > currentIndex;
 
                     return (
-                      <div key={step.label} className="flex flex-col items-center">
+                      <div key={step} className="flex flex-col items-center">
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: index * 0.1 }}
                           className={`w-10 h-10 rounded-full flex items-center justify-center text-lg z-10 transition-all ${
-                            isCompleted ? getStatusColor(statusResult.status) : 'bg-gray-200'
-                          } ${isCurrent ? 'ring-4 ring-primary/30' : ''}`}
+                            isCompleted ? 'bg-blue-500' : isCurrent ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'
+                          }`}
                         >
-                          {step.icon}
+                          {isCompleted ? '✓' : isCurrent ? '●' : '○'}
                         </motion.div>
                         <span className={`text-xs mt-2 font-medium ${
-                          isCompleted ? 'text-primary' : 'text-gray-400'
+                          isCompleted || isCurrent ? 'text-blue-600' : 'text-gray-400'
                         }`}>
-                          {step.label}
+                          {step}
                         </span>
                       </div>
                     );

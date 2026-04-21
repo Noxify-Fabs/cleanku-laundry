@@ -79,6 +79,17 @@ const AdminDashboard = () => {
     return currentStatus;
   };
 
+  const getNextStatusLabel = (currentStatus) => {
+    const labels = {
+      'Diterima': '✓ Proses Penjemputan',
+      'Dijemput': '✓ Mulai Cuci',
+      'Dicuci': '✓ Mulai Setrika',
+      'Disetrika': '✓ Siap Diantar',
+      'Siap Antar': '✓ Selesai',
+    };
+    return labels[currentStatus] || '';
+  };
+
   const togglePaymentStatus = async (orderNumber, currentStatus) => {
     const newStatus = currentStatus === 'paid' ? 'unpaid' : 'paid';
     try {
@@ -362,8 +373,36 @@ const AdminDashboard = () => {
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <button onClick={() => sendWhatsApp(order)} className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 mr-2">WA</button>
-                          <button onClick={() => { setSelectedOrder(order); setShowModal(true); }} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Detail</button>
+                          <div className="flex gap-2 flex-wrap">
+                            {order.status === 'Selesai' ? (
+                              <span className="px-3 py-1 bg-green-500 text-white rounded text-sm">Selesai ✓</span>
+                            ) : (
+                              <button
+                                onClick={() => updateOrderStatus(order.id, nextStatus(order.status))}
+                                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                              >
+                                {getNextStatusLabel(order.status)}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => togglePaymentStatus(order.id, order.paymentStatus)}
+                              className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                            >
+                              {order.paymentStatus === 'paid' ? 'Batal Lunas' : 'Tandai Lunas'}
+                            </button>
+                            <button
+                              onClick={() => sendWhatsApp(order)}
+                              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                            >
+                              📱 WA
+                            </button>
+                            <button
+                              onClick={() => { setSelectedOrder(order); setShowModal(true); }}
+                              className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                            >
+                              Detail
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -454,18 +493,21 @@ const AdminDashboard = () => {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex gap-2 flex-wrap">
-                              <button
-                                onClick={() => updateOrderStatus(order.id, nextStatus(order.status))}
-                                disabled={order.status === 'Selesai'}
-                                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                              >
-                                → Next
-                              </button>
+                              {order.status === 'Selesai' ? (
+                                <span className="px-3 py-1 bg-green-500 text-white rounded text-sm">Selesai ✓</span>
+                              ) : (
+                                <button
+                                  onClick={() => updateOrderStatus(order.id, nextStatus(order.status))}
+                                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                                >
+                                  {getNextStatusLabel(order.status)}
+                                </button>
+                              )}
                               <button
                                 onClick={() => togglePaymentStatus(order.id, order.paymentStatus)}
                                 className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
                               >
-                                💰 {order.paymentStatus === 'paid' ? 'Batal' : 'Lunas'}
+                                {order.paymentStatus === 'paid' ? 'Batal Lunas' : 'Tandai Lunas'}
                               </button>
                               <button
                                 onClick={() => sendWhatsApp(order)}
