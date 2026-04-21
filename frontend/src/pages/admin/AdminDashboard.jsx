@@ -19,8 +19,8 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [paymentFilter, setPaymentFilter] = useState('Semua');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    return localStorage.getItem('sidebarCollapsed') === 'true';
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return localStorage.getItem('sidebarOpen') !== 'false';
   });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const navigate = useNavigate();
@@ -36,8 +36,8 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
-  }, [sidebarCollapsed]);
+    localStorage.setItem('sidebarOpen', sidebarOpen);
+  }, [sidebarOpen]);
 
   const fetchData = async () => {
     try {
@@ -274,73 +274,48 @@ const AdminDashboard = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed h-full bg-white shadow-lg transition-all duration-300 ease-in-out z-40 ${
-          sidebarCollapsed ? 'w-16' : 'w-64'
+        className={`fixed h-full bg-white shadow-lg overflow-hidden z-40 transition-all duration-250 ease-in-out ${
+          sidebarOpen ? 'w-60 translate-x-0' : 'w-0 -translate-x-full'
         } ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
-        <div className="p-4 border-b flex items-center justify-between">
-          {!sidebarCollapsed ? (
-            <h1 className="text-xl font-bold text-blue-600">CleanKu Admin</h1>
-          ) : (
-            <span className="text-xl font-bold text-blue-600">CK</span>
-          )}
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {sidebarCollapsed ? '→' : '←'}
-          </button>
-        </div>
-        <nav className="p-4">
-          <button
-            onClick={() => setCurrentPage('dashboard')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
-              currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-            }`}
-            title={sidebarCollapsed ? 'Dashboard' : ''}
-          >
-            <span className="text-xl">📊</span>
-            {!sidebarCollapsed && <span>Dashboard</span>}
-          </button>
-          <button
-            onClick={() => setCurrentPage('pesanan')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
-              currentPage === 'pesanan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-            }`}
-            title={sidebarCollapsed ? 'Pesanan' : ''}
-          >
-            <span className="text-xl">📦</span>
-            {!sidebarCollapsed && (
-              <span className="flex-1">
-                Pesanan
-                {orders.length > 0 && <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{orders.length}</span>}
-              </span>
-            )}
-            {sidebarCollapsed && orders.length > 0 && (
-              <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{orders.length}</span>
-            )}
-          </button>
-          <button
-            onClick={() => setCurrentPage('pengaturan')}
-            className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 ${
-              currentPage === 'pengaturan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
-            }`}
-            title={sidebarCollapsed ? 'Pengaturan' : ''}
-          >
-            <span className="text-xl">⚙️</span>
-            {!sidebarCollapsed && <span>Pengaturan</span>}
-          </button>
-        </nav>
-        <div className="absolute bottom-0 w-full p-4 border-t">
-          <button
-            onClick={() => { localStorage.removeItem('adminAuth'); navigate('/admin/login'); }}
-            className={`w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 flex items-center gap-3`}
-            title={sidebarCollapsed ? 'Logout' : ''}
-          >
-            <span className="text-xl">🚪</span>
-            {!sidebarCollapsed && <span>Logout</span>}
-          </button>
+        <div className="w-60 min-w-60 h-full flex flex-col">
+          <div className="p-6 border-b">
+            <h1 className="text-2xl font-bold text-blue-600">CleanKu Admin</h1>
+          </div>
+          <nav className="p-4 flex-1">
+            <button
+              onClick={() => setCurrentPage('dashboard')}
+              className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
+                currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+              }`}
+            >
+              📊 Dashboard
+            </button>
+            <button
+              onClick={() => setCurrentPage('pesanan')}
+              className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
+                currentPage === 'pesanan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+              }`}
+            >
+              📦 Pesanan {orders.length > 0 && <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">{orders.length}</span>}
+            </button>
+            <button
+              onClick={() => setCurrentPage('pengaturan')}
+              className={`w-full text-left px-4 py-3 rounded-lg mb-2 ${
+                currentPage === 'pengaturan' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+              }`}
+            >
+              ⚙️ Pengaturan
+            </button>
+          </nav>
+          <div className="p-4 border-t">
+            <button
+              onClick={() => { localStorage.removeItem('adminAuth'); navigate('/admin/login'); }}
+              className="w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
+            >
+              🚪 Logout
+            </button>
+          </div>
         </div>
       </div>
 
@@ -352,6 +327,16 @@ const AdminDashboard = () => {
         />
       )}
 
+      {/* Toggle button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className={`hidden md:flex fixed z-50 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-all duration-250 ease-in-out ${
+          sidebarOpen ? 'left-64' : 'left-4'
+        } top-4`}
+      >
+        ☰
+      </button>
+
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
@@ -362,8 +347,8 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <div
-        className={`flex-1 p-8 transition-all duration-300 ease-in-out ${
-          sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
+        className={`flex-1 p-8 transition-all duration-250 ease-in-out ${
+          sidebarOpen ? 'md:ml-60' : 'md:ml-0'
         } ml-0`}
       >
         <div className="flex justify-between items-center mb-8">
