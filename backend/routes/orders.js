@@ -189,7 +189,7 @@ async function togglePaymentStatus(req, res) {
     const { paymentStatus } = req.body;
 
     if (!paymentStatus) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Missing payment status field',
         message: 'Please provide the payment status to update (paid/unpaid)'
       });
@@ -197,7 +197,7 @@ async function togglePaymentStatus(req, res) {
 
     const validStatuses = ['paid', 'unpaid'];
     if (!validStatuses.includes(paymentStatus)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid payment status',
         message: `Payment status must be one of: ${validStatuses.join(', ')}`
       });
@@ -207,7 +207,7 @@ async function togglePaymentStatus(req, res) {
     const orderIndex = db.orders.findIndex(o => o.id === orderNumber);
 
     if (orderIndex === -1) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Order not found',
         message: `No order found with number: ${orderNumber}`
       });
@@ -223,9 +223,78 @@ async function togglePaymentStatus(req, res) {
     });
   } catch (error) {
     console.error('Error updating payment status:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to update payment status'
+    });
+  }
+}
+
+// DELETE /api/orders/:orderNumber - Delete order
+async function deleteOrder(req, res) {
+  try {
+    const { orderNumber } = req.params;
+
+    const db = await readDB();
+    const orderIndex = db.orders.findIndex(o => o.id === orderNumber);
+
+    if (orderIndex === -1) {
+      return res.status(404).json({
+        error: 'Order not found',
+        message: `No order found with number: ${orderNumber}`
+      });
+    }
+
+    db.orders.splice(orderIndex, 1);
+    await writeDB(db);
+
+    res.status(200).json({
+      success: true,
+      message: 'Order deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to delete order'
+    });
+  }
+}
+
+// GET /api/orders/stats - Get order statistics
+async function getOrderStats(req, res) {
+  try {
+    const db = await readDB();
+    const orders = db.orders || [];
+    const today = new Date().toISOString().slice(0, 10);
+
+    const total = orders.length;
+    const newOrders = orders.filter(o => o.status === 'Diterima').length;
+    const inProgress = orders.filter(o =>
+      ['Dijemput', 'Dicuci', 'Disetrika', 'Siap Antar'].includes(o.status)
+    ).length;
+    const completedToday = orders.filter(o =>
+      o.status === 'Selesai' && o.createdAt && o.createdAt.startsWith(today)
+    ).length;
+    const unpaid = orders.filter(o => o.paymentStatus === 'unpaid').length;
+    const paid = orders.filter(o => o.paymentStatus === 'paid').length;
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        total,
+        new: newOrders,
+        inProgress,
+        completedToday,
+        unpaid,
+        paid
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching order stats:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to fetch order statistics'
     });
   }
 }
@@ -235,5 +304,7 @@ module.exports = {
   getOrderByNumber,
   getAllOrders,
   updateOrderStatus,
-  togglePaymentStatus
+  togglePaymentStatus,
+  deleteOrder,
+  getOrderStats
 };

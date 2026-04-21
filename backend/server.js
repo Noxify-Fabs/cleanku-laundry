@@ -3,7 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { createOrder, getOrderByNumber, getAllOrders, updateOrderStatus, togglePaymentStatus } = require('./routes/orders');
+const { createOrder, getOrderByNumber, getAllOrders, updateOrderStatus, togglePaymentStatus, deleteOrder, getOrderStats } = require('./routes/orders');
 const { submitContact } = require('./routes/contact');
 
 const app = express();
@@ -85,8 +85,10 @@ app.get('/', (req, res) => {
 app.post('/api/orders', upload.single('paymentProof'), createOrder);
 app.get('/api/orders', getAllOrders);
 app.get('/api/orders/:orderNumber', getOrderByNumber);
+app.get('/api/orders/stats', getOrderStats);
 app.put('/api/orders/:orderNumber', updateOrderStatus);
 app.put('/api/orders/:orderNumber/payment-status', togglePaymentStatus);
+app.delete('/api/orders/:orderNumber', deleteOrder);
 
 // Contact routes
 app.post('/api/contact', submitContact);
