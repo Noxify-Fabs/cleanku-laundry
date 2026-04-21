@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import API_BASE_URL from '../api/config';
 
 const CekStatus = () => {
   const [searchParams] = useSearchParams();
@@ -229,7 +230,7 @@ const CekStatus = () => {
                     <div>
                       <p className="text-sm text-gray-600">Bukti Pembayaran</p>
                       <img
-                        src={`http://localhost:5000/uploads/${statusResult.paymentProof}`}
+                        src={`${API_BASE_URL}/uploads/${statusResult.paymentProof}`}
                         alt="Payment proof"
                         className="max-w-xs max-h-48 rounded-lg border border-gray-300 mt-2"
                       />

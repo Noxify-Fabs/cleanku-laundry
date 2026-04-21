@@ -19,13 +19,15 @@ const AdminDashboard = () => {
       return;
     }
     fetchOrders();
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval);
   }, [navigate]);
 
   const fetchOrders = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/api/orders`);
+      const response = await axios.get(`${API_URL}/orders`);
       if (response.data.success) {
         setOrders(response.data.orders);
       }
